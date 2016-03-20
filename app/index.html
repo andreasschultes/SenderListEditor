@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!--
+/* 
+ * Copyright (C) 2016 Andreas Schultes
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<html lang="de">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+        <link href="bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/file-saver/FileSaver.js"></script>
+    
+    <script src="handlefile.js"></script>
+        
+        <div ng-app="myApp" ng-controller="myController">
+            <nav class="navbar navbar-default">
+                <div class="container">                   
+                    <div class="navbar-header">
+                        <div class="row">
+                            <div class="col-xs-12 col-md-4 col-lg-4"> 
+                                <label class="control-label" for="XSPFfileInput">Select XSPF File</label>
+                                <span class="btn btn-primary btn-lg btn-file">Browse
+                                <input id="XSPFfileInput" type="file" custom-on-change="fileNameChanged" >
+                                </span>
+                            </div>
+                           <div class="col-xs-12 col-md-4 col-lg-4"> 
+                                <label class="control-label" for="MU3fileInput">Select MU3 File</label>
+                                <span class="btn btn-primary btn-lg btn-file">Browse
+                                <input id="MU3fileInput" type="file" custom-on-change="openMU3File" >
+                                </span>
+                            </div> 
+                            <div class="col-xs-12 col-md-4 col-lg-4"> 
+                                <label class="control-label" for="XSPFfileSave">Save a XSPF File</label>
+                                <button type="button" if="XSPFfileSave" class="btn btn-primary btn-lg" ng-click="download()">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                   <!-- <h1>Number of Files: {{numFiles}}</h1>
+                        <table>
+                            <tr ng-repeat="file in files">
+                                <td>{{file.name}}</td>
+                            </tr>
+                        </table>-->
+
+                            <div class="col-xs-12">
+                                <label class="control-label" for="FullTextTableSearch">Search in Table</label>
+                                <input id="FullTextTableSearch" type="text" ng-model="search.$" class="input-lg">
+                            </div>
+                            <div class="col-xs-12 col-md-6 col-lg-3">
+                                <label class="control-label" for="TitleSearch">Search Title</label>
+                                <input type="text" id="TitleSearch" ng-model="search.title">
+                            </div>
+                            <div class="col-xs-12 col-md-6 col-lg-3">
+                                <label class="control-label" for="SenderSearch">Search Sender Group</label>
+                                <input type="text" id="SenderSearch" ng-model="search.album">
+                            </div>
+                            <div class="col-xs-12 col-md-6 col-lg-3">
+                                <label class="control-label" for="OwnerSearch">Search Sender Owner</label>
+                                <input type="text" id="OwnerSearch" ng-model="search.creator">
+                            </div>
+                            <div class="col-xs-12 col-md-6 col-lg-3">
+                                <label class="control-label" for="TypeSearch">Search Type</label>
+                                <select type="text" id="TypeSearch" ng-model="search.info" ng-options="opt for opt in InfoOptions"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </nav>
+            <div class="trackcontent">
+                <div ng-hide="!tracks">
+             <!--   <h2> Content of Files </h2>
+                <label class="control-label" for="FullTextTableSearch">Search in Table</label>
+                <input id="FullTextTableSearch" type="text" ng-model="search.$" class="input-lg">
+                <table class="table top">
+                    <tr>
+                        <td></td>
+                        <td><input type="text" ng-model="search.title"></td>
+                        <td><input type="text" ng-model="search.album"></td>
+                        <td><input type="text" ng-model="search.creator"></td>
+                        <td><input type="text" ng-model="search.info"></td>
+                        <td></td>
+                    </tr>
+                </table>-->
+                
+              
+                    <div class="container ">
+                        <div ng-repeat="track in tracks | filter:search:false" class="box-content">
+                            <div class="row">
+                                <div class="col-xs-12 col-lg-10">
+
+                                    <div class="row"> 
+                                        <div class="col-xs-1 col-md-1 col-lg-1">
+                                            {{track.index}}
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="SenderLabel">Sender</label>
+                                            <input  class="form-control" id="SenderLabel" type="text" ng-model="track.title">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="SenderGroupLabel">Sender group</label>
+                                            <input  class="form-control" id="SenderGroupLabel" type="text" ng-model="track.album">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="SenderOwnerLabel">Sender owner</label>
+                                            <input  class="form-control" id="SenderOwnerLabel" type="text" ng-model="track.creator">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="SenderTypeLabel">Sender type</label>
+                                            <select id="SenderTypeLabel" class="form-control" ng-model="track.info" ng-options="opt for opt in InfoOptions"></select>
+                                        </div>
+
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="MSYSLabel">DVB Type {{track.mu3dvb_parms.MSYS}}</label>
+                                            <select id="MSYSLabel" class="form-control" ng-model="track.location.MSYS" ng-options="opt for opt in MSYSOptions"></select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="FrequencyLabel">Frequency {{track.mu3dvb_parms.Frequency}}</label>
+                                            <input id="FrequencyLabel" class="form-control" type="text" ng-model="track.location.Frequency">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="SampleRateLabel">Symbol Rate {{track.mu3dvb_parms.SamplingRate}}</label>
+                                            <input id="SampleRateLabel" class="form-control" type="text" ng-model="track.location.SamplingRate">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="PolarisationLabel">Polarisation {{track.mu3dvb_parms.Polarisation}}</label>
+                                            <select id="PolarisationLabel" class="form-control" ng-model="track.location.Polarisation" ng-options="opt for opt in PolarisationOptions"></select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="FECLabel">FEC Inner {{track.mu3dvb_parms.FEC}}</label>
+                                            <select id="FECLabel" class="form-control" ng-model="track.location.FEC" ng-options="opt for opt in FECOptions"></select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
+                                            <label class="control-label" for="MTypeLabel">Modulation Type {{track.mu3dvb_parms.MSYS}}</label>
+                                            <select id="MTypeLabel" class="form-control" ng-model="track.location.MType" ng-options="opt for opt in MTypeOptions"></select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
+                                            <label class="control-label" for="ROLabel">Roll Off {{track.mu3dvb_parms.RO}}</label>
+                                            <select id="ROLabel" class="form-control" ng-model="track.location.RO" ng-options="opt for opt in ROOptions" ></select>
+                                        </div>
+                                         <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
+                                            <label class="control-label" for="PLTSLabel">Pilot Tones {{track.mu3dvb_parms.PLTS}}</label>
+                                            <select id="PLTSLabel" class="form-control" ng-model="track.location.PLTS" ng-options="opt for opt in PLTSOptions" ></select>
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="PID1Label">PID {{track.mu3dvb_parms.PID1}}</label>
+                                            <input id="PID1Label" class="form-control" type="text" ng-model="track.location.PID1">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="PID2Label">PID {{track.mu3dvb_parms.PID2}}</label>
+                                            <input id="PID2Label" class="form-control" type="text" ng-model="track.location.PID2">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="PID3Label">PID {{track.mu3dvb_parms.PID3}}</label>
+                                            <input id="PID3Label" class="form-control" type="text" ng-model="track.location.PID3">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <label class="control-label" for="PID4Label">PID {{track.mu3dvb_parms.PID4}}</label>
+                                            <input id="PID4Label" class="form-control" type="text" ng-model="track.location.PID4">
+                                        </div>
+                                        <div class="col-xs-6 col-md-3 col-lg-2">
+                                            <h4>{{track.compare_status}}</h4>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                           <!--- <input type="text" ng-model="track.image"><img ng-src="{{track.image}}">-->
+                                <div class="col-xs-12 col-lg-2">
+                                     <div class="btn-group-vertical" role="group" >
+                                         <button type="button" class="btn " ng-click="moveTrackUp(track.index)">
+                                             <span class="glyphicon glyphicon-arrow-up" ></span>
+                                         </button>
+                                         <button type="button" class="btn " ng-click="moveTrackDown(track.index)" >
+                                             <span class="glyphicon glyphicon-arrow-down"></span>
+                                         </button>
+                                     </div>
+                                    <div class="btn-group-vertical" role="group" >
+                                         <button type="button" class="btn " ng-click="addTrack(track.index)">
+                                             <span class="glyphicon glyphicon-plus" ></span>
+                                         </button>
+                                         <button type="button" class="btn " ng-click="deleteTrack(track.index)" >
+                                             <span class="glyphicon glyphicon-trash"></span>
+                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>       
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
