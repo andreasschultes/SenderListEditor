@@ -33,8 +33,11 @@ myApp.directive('customOnChange',function(){
 
 
 
-myApp.controller('myController',function($scope){
+myApp.controller('myController',function($scope,$location){
     $scope.numFiles=numFiles;
+    
+    $scope.LoadXSPFStatus;
+    $scope.LoadMU3Status;
     
     $scope.InfoOptions=[undefined,'Radio','HD'];
     $scope.FECOptions=["12","23","34","56","78","89","35","45","910"];
@@ -59,9 +62,13 @@ myApp.controller('myController',function($scope){
                     var xml=parser.parseFromString(event.target.result,"application/xml");
                     $scope.tracks=xspf_read(xml);
                     $scope.fileContent.push(xml.firstChild);
-                    $scope.$apply(); 
+                     
+                    $scope.LoadXSPFStatus="Loaded";
+                    $scope.$apply();
                 }
             };
+            $scope.LoadXSPFStatus="Loading";
+            $scope.$apply();
             reader.readAsBinaryString(event.target.files[i]);
        // $scope.files= event.target.files;
         }
@@ -78,9 +85,13 @@ myApp.controller('myController',function($scope){
             if(event.target.readyState==FileReader.DONE){
                var mu3Tracks= mu3_read(event.target.result);
                compareXSPFwithMU3($scope.tracks,mu3Tracks);
+               
+               $scope.LoadMU3Status="Loaded";
                $scope.$apply(); 
             }
         };
+        $scope.LoadMU3Status="Loading";
+        $scope.$apply();
         reader.readAsBinaryString(event.target.files[0]);
     };
     
@@ -130,16 +141,18 @@ myApp.controller('myController',function($scope){
         var content=write_xspf($scope.tracks,filename);
         var blob = new Blob([content], {type: "application/xml"});
         saveAs(blob, filename);
-        
-        
-
     };
+    
+    $scope.callVideo=function(TrackId){
+        window.location.href=(get_url_from_dvb_parm($scope.tracks[TrackId].location));
+    }
 });
 
 function compareXSPFwithMU3(xspf,mu3)
 {
     if(xspf===undefined || mu3===undefined)
         return;
+    var $match=0,$new=0,$mismatch=0;
     var i,lenMU3=mu3.length;
     for(i=0;i<lenMU3;i++){
         var found_track=false;
@@ -152,11 +165,13 @@ function compareXSPFwithMU3(xspf,mu3)
                 if(compare_dvb_parms(xspf[j].location,mu3[i].dvb_parms))
                 {
                     xspf[j].compare_status="ok";
+                    $match++;
                 }
                 else
                 {
                     xspf[j].compare_status="mismatch";
                     xspf[j].mu3dvb_parms=mu3[i].dvb_parms;
+                    $mismatch++;
                 }
             }
         }
@@ -168,8 +183,14 @@ function compareXSPFwithMU3(xspf,mu3)
             track_entry.compare_status="new";
             track_entry.index=j;
             xspf.push(track_entry);
+            $new++;
         }
     }
+    xspf.new=$new;
+    xspf.match=$match;
+    xspf.mismatch=$mismatch;
+    xspf.total=xspf.length;
+    xspf.old=xspf.length-xspf.new-xspf.mismatch-xspf.match;
 }
 
 function compare_dvb_parms(a,b)
@@ -315,16 +336,32 @@ function get_dvb_parm_from_url(url)
             if(pids[2]==="18")
             {
                 dvb_parm.PID1=parseInt(pids[3]);
+                if(isNaN(dvb_parm.PID1))
+                    dvb_parm.PID1=0;
                 dvb_parm.PID2=parseInt(pids[4]);
+                if(isNaN(dvb_parm.PID2))
+                    dvb_parm.PID2=0;
                 dvb_parm.PID3=parseInt(pids[5]);
+                if(isNaN(dvb_parm.PID3))
+                    dvb_parm.PID3=0;
                 dvb_parm.PID4=parseInt(pids[6]);
+                if(isNaN(dvb_parm.PID4))
+                    dvb_parm.PID4=0;
             }
             else
             {
                 dvb_parm.PID1=parseInt(pids[2]);
+                if(isNaN(dvb_parm.PID1))
+                    dvb_parm.PID1=0;
                 dvb_parm.PID2=parseInt(pids[3]);
+                if(isNaN(dvb_parm.PID2))
+                    dvb_parm.PID2=0;
                 dvb_parm.PID3=parseInt(pids[4]);
+                if(isNaN(dvb_parm.PID3))
+                    dvb_parm.PID3=0;
                 dvb_parm.PID4=parseInt(pids[5]);
+                if(isNaN(dvb_parm.PID4))
+                    dvb_parm.PID4=0;
             }    
         }
     }
