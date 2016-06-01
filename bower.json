@@ -1,9 +1,9 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
+  "name": "SenderListEditor",
+  "description": "A program for editing SATIP-Translator senderlists",
   "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
-  "license": "MIT",
+  "homepage": "https://github.com/andreasschultes/senderlisteditor",
+  "license": "GPL3",
   "private": true,
   "dependencies": {
     "angular": "1.5.0",
