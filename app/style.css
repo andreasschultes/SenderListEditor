@@ -35,12 +35,42 @@
     display: block;
 }
 
+.trackIndex{
+    padding-top: 8px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.playbutton{
+    margin: 5px;
+}
 .box-content{
     margin-top: 5px;
     margin-bottom: 5px;
+    padding: 3px;
+    border: solid black;
 }
 
 .box-content:nth-child(odd)
 {
     background: lightgray;
+}
+
+body{
+    padding-bottom: 140px;
+}
+
+.glyphicon.spinning {
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin-webkit 1s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg); }
+    to { transform: scale(1) rotate(360deg); }
+}
+
+@-webkit-keyframes spin-webkit {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
 }

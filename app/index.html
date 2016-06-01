@@ -34,7 +34,7 @@
     
     <script src="handlefile.js"></script>
         
-        <div ng-app="myApp" ng-controller="myController">
+        <div ng-app="myApp" ng-controller="myController" ng-model-options="{updateOn : 'change blur'}">
             <nav class="navbar navbar-default">
                 <div class="container">                   
                     <div class="navbar-header">
@@ -44,12 +44,20 @@
                                 <span class="btn btn-primary btn-lg btn-file">Browse
                                 <input id="XSPFfileInput" type="file" custom-on-change="fileNameChanged" >
                                 </span>
+                                <div >
+                                    <span class="glyphicon glyphicon-refresh spinning" ng-show="LoadXSPFStatus==='Loading'"> </span>
+                                    {{LoadXSPFStatus}}
+                                </div>
                             </div>
                            <div class="col-xs-12 col-md-4 col-lg-4"> 
                                 <label class="control-label" for="MU3fileInput">Select MU3 File</label>
                                 <span class="btn btn-primary btn-lg btn-file">Browse
                                 <input id="MU3fileInput" type="file" custom-on-change="openMU3File" >
                                 </span>
+                                <div>
+                                    <span class="glyphicon glyphicon-refresh spinning" ng-show="LoadMU3Status==='Loading'"></span>
+                                    {{LoadMU3Status}}
+                                </div>
                             </div> 
                             <div class="col-xs-12 col-md-4 col-lg-4"> 
                                 <label class="control-label" for="XSPFfileSave">Save a XSPF File</label>
@@ -58,35 +66,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row">
-                   <!-- <h1>Number of Files: {{numFiles}}</h1>
-                        <table>
-                            <tr ng-repeat="file in files">
-                                <td>{{file.name}}</td>
-                            </tr>
-                        </table>-->
-
-                            <div class="col-xs-12">
-                                <label class="control-label" for="FullTextTableSearch">Search in Table</label>
-                                <input id="FullTextTableSearch" type="text" ng-model="search.$" class="input-lg">
-                            </div>
-                            <div class="col-xs-12 col-md-6 col-lg-3">
-                                <label class="control-label" for="TitleSearch">Search Title</label>
-                                <input type="text" id="TitleSearch" ng-model="search.title">
-                            </div>
-                            <div class="col-xs-12 col-md-6 col-lg-3">
-                                <label class="control-label" for="SenderSearch">Search Sender Group</label>
-                                <input type="text" id="SenderSearch" ng-model="search.album">
-                            </div>
-                            <div class="col-xs-12 col-md-6 col-lg-3">
-                                <label class="control-label" for="OwnerSearch">Search Sender Owner</label>
-                                <input type="text" id="OwnerSearch" ng-model="search.creator">
-                            </div>
-                            <div class="col-xs-12 col-md-6 col-lg-3">
-                                <label class="control-label" for="TypeSearch">Search Type</label>
-                                <select type="text" id="TypeSearch" ng-model="search.info" ng-options="opt for opt in InfoOptions"></select>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>   
             </nav>
@@ -113,7 +93,7 @@
                                 <div class="col-xs-12 col-lg-10">
 
                                     <div class="row"> 
-                                        <div class="col-xs-1 col-md-1 col-lg-1">
+                                        <div class="col-xs-1 col-md-1 col-lg-1 trackIndex">
                                             {{track.index}}
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
@@ -135,51 +115,135 @@
 
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="MSYSLabel">DVB Type {{track.mu3dvb_parms.MSYS}}</label>
+                                            <div class="input-group">
                                             <select id="MSYSLabel" class="form-control" ng-model="track.location.MSYS" ng-options="opt for opt in MSYSOptions"></select>
+                                            <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.MSYS!=track.location.MSYS&&track.compare_status==='mismatch'" ng-click="track.location.MSYS=track.mu3dvb_parms.MSYS">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="FrequencyLabel">Frequency {{track.mu3dvb_parms.Frequency}}</label>
-                                            <input id="FrequencyLabel" class="form-control" type="text" ng-model="track.location.Frequency">
+                                            <div class="input-group">
+                                                <input id="FrequencyLabel" class="form-control" type="text" ng-model="track.location.Frequency">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.Frequency!=track.location.Frequency&&track.compare_status==='mismatch'" ng-click="track.location.Frequency=track.mu3dvb_parms.Frequency">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="SampleRateLabel">Symbol Rate {{track.mu3dvb_parms.SamplingRate}}</label>
-                                            <input id="SampleRateLabel" class="form-control" type="text" ng-model="track.location.SamplingRate">
+                                            <div class="input-group">
+                                                <input id="SampleRateLabel" class="form-control" type="text" ng-model="track.location.SamplingRate">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.SamplingRate!=track.location.SamplingRate&&track.compare_status==='mismatch'" ng-click="track.location.SamplingRate=track.mu3dvb_parms.SamplingRate">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="PolarisationLabel">Polarisation {{track.mu3dvb_parms.Polarisation}}</label>
-                                            <select id="PolarisationLabel" class="form-control" ng-model="track.location.Polarisation" ng-options="opt for opt in PolarisationOptions"></select>
+                                            <div class="input-group">
+                                                <select id="PolarisationLabel" class="form-control" ng-model="track.location.Polarisation" ng-options="opt for opt in PolarisationOptions"></select>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.Polarisation!=track.location.Polarisation&&track.compare_status==='mismatch'" ng-click="track.location.Polarisation=track.mu3dvb_parms.Polarisation">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="FECLabel">FEC Inner {{track.mu3dvb_parms.FEC}}</label>
-                                            <select id="FECLabel" class="form-control" ng-model="track.location.FEC" ng-options="opt for opt in FECOptions"></select>
+                                            <div class="input-group">
+                                                <select id="FECLabel" class="form-control" ng-model="track.location.FEC" ng-options="opt for opt in FECOptions"></select>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.FEC!=track.location.FEC&&track.compare_status==='mismatch'" ng-click="track.location.FEC=track.mu3dvb_parms.FEC">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
-                                            <label class="control-label" for="MTypeLabel">Modulation Type {{track.mu3dvb_parms.MSYS}}</label>
-                                            <select id="MTypeLabel" class="form-control" ng-model="track.location.MType" ng-options="opt for opt in MTypeOptions"></select>
+                                            <label class="control-label" for="MTypeLabel">Modulation Type {{track.mu3dvb_parms.MType}}</label>
+                                            <div class="input-group">
+                                                <select id="MTypeLabel" class="form-control" ng-model="track.location.MType" ng-options="opt for opt in MTypeOptions"></select>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.MType!=track.location.MType&&track.compare_status==='mismatch'" ng-click="track.location.MType=track.mu3dvb_parms.MType">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
                                             <label class="control-label" for="ROLabel">Roll Off {{track.mu3dvb_parms.RO}}</label>
-                                            <select id="ROLabel" class="form-control" ng-model="track.location.RO" ng-options="opt for opt in ROOptions" ></select>
+                                            <div class="input-group">
+                                                <select id="ROLabel" class="form-control" ng-model="track.location.RO" ng-options="opt for opt in ROOptions" ></select>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.RO!=track.location.RO&&track.compare_status==='mismatch'" ng-click="track.location.RO=track.mu3dvb_parms.RO">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                          <div class="col-xs-6 col-md-3 col-lg-2" ng-show="track.location.MSYS=='dvbs2'">
                                             <label class="control-label" for="PLTSLabel">Pilot Tones {{track.mu3dvb_parms.PLTS}}</label>
-                                            <select id="PLTSLabel" class="form-control" ng-model="track.location.PLTS" ng-options="opt for opt in PLTSOptions" ></select>
+                                            <div class="input-group">
+                                                <select id="PLTSLabel" class="form-control" ng-model="track.location.PLTS" ng-options="opt for opt in PLTSOptions" ></select>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.PLTS!=track.location.PLTS&&track.compare_status==='mismatch'" ng-click="track.location.PLTS=track.mu3dvb_parms.PLTS">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="PID1Label">PID {{track.mu3dvb_parms.PID1}}</label>
-                                            <input id="PID1Label" class="form-control" type="text" ng-model="track.location.PID1">
+                                            <div class="input-group">
+                                                <input id="PID1Label" class="form-control" type="text" ng-model="track.location.PID1">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default " ng-show="track.mu3dvb_parms.PID1!=track.location.PID1&&track.compare_status==='mismatch'" ng-click="track.location.PID1=track.mu3dvb_parms.PID1">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
-                                            <label class="control-label" for="PID2Label">PID {{track.mu3dvb_parms.PID2}}</label>
-                                            <input id="PID2Label" class="form-control" type="text" ng-model="track.location.PID2">
+                                            <label class="control-label" form="PID2Label">PID {{track.mu3dvb_parms.PID2}}</label>
+                                            <div class="input-group">
+                                                <input id="PID2Label" class="form-control" type="text" ng-model="track.location.PID2">
+                                                <span class="input-group-btn">
+                                                    <button id="PID2Label" type="button" class="btn btn-default" ng-show="track.mu3dvb_parms.PID2!=track.location.PID2&&track.compare_status==='mismatch'" ng-click="track.location.PID2=track.mu3dvb_parms.PID2">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="PID3Label">PID {{track.mu3dvb_parms.PID3}}</label>
-                                            <input id="PID3Label" class="form-control" type="text" ng-model="track.location.PID3">
+                                            <div class="input-group">
+                                                <input id="PID3Label" class="form-control" type="text" ng-model="track.location.PID3">
+                                                <span class="input-group-btn">
+                                                    <button id="PID2Label" type="button" class="btn btn-default" ng-show="track.mu3dvb_parms.PID3!=track.location.PID3&&track.compare_status==='mismatch'" ng-click="track.location.PID3=track.mu3dvb_parms.PID3">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <label class="control-label" for="PID4Label">PID {{track.mu3dvb_parms.PID4}}</label>
-                                            <input id="PID4Label" class="form-control" type="text" ng-model="track.location.PID4">
+                                            <div class="input-group">
+                                                <input id="PID4Label" class="form-control" type="text" ng-model="track.location.PID4">
+                                                <span class="input-group-btn">
+                                                    <button id="PID2Label" type="button" class="btn btn-default" ng-show="track.mu3dvb_parms.PID4!=track.location.PID4&&track.compare_status==='mismatch'" ng-click="track.location.PID4=track.mu3dvb_parms.PID4">
+                                                        <span class="glyphicon glyphicon-import"></span>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-xs-6 col-md-3 col-lg-2">
                                             <h4>{{track.compare_status}}</h4>
@@ -191,20 +255,26 @@
                            <!--- <input type="text" ng-model="track.image"><img ng-src="{{track.image}}">-->
                                 <div class="col-xs-12 col-lg-2">
                                      <div class="btn-group-vertical" role="group" >
-                                         <button type="button" class="btn " ng-click="moveTrackUp(track.index)">
+                                         <button type="button" class="btn btn-primary " ng-click="moveTrackUp(track.index)">
                                              <span class="glyphicon glyphicon-arrow-up" ></span>
                                          </button>
-                                         <button type="button" class="btn " ng-click="moveTrackDown(track.index)" >
+                                         <button type="button" class="btn btn-primary" ng-click="moveTrackDown(track.index)" >
                                              <span class="glyphicon glyphicon-arrow-down"></span>
                                          </button>
                                      </div>
                                     <div class="btn-group-vertical" role="group" >
-                                         <button type="button" class="btn " ng-click="addTrack(track.index)">
+                                         <button type="button" class="btn btn-primary" ng-click="addTrack(track.index)">
                                              <span class="glyphicon glyphicon-plus" ></span>
                                          </button>
-                                         <button type="button" class="btn " ng-click="deleteTrack(track.index)" >
+                                         <button type="button" class="btn btn-primary" ng-click="deleteTrack(track.index)" >
                                              <span class="glyphicon glyphicon-trash"></span>
                                          </button>
+                                    </div>
+                                    
+                                    <div>
+                                        <button type="button" class="btn btn-primary btn-lg playbutton" ng-click="callVideo(track.index)" >
+                                             <span class="glyphicon glyphicon-play"></span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -213,6 +283,50 @@
                     </div>       
                 </div>
             </div>
+            <nav class="navbar navbar-default navbar-fixed-bottom navbar-inverse" >
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-2 col-lg-offset-1">
+                            <label class="label" for="FullTextTableSearch">Search in Table</label>
+                            <input id="FullTextTableSearch" type="text" ng-model="search.$" class="form-control">
+                        </div>
+                        <div class="col-xs-12 col-md-6 col-lg-2">
+                            <label class="label" for="TitleSearch">Search Title</label>
+                            <input type="text" id="TitleSearch" ng-model="search.title" class="form-control">
+                        </div>
+                        <div class="col-xs-12 col-md-6 col-lg-2">
+                            <label class="label" for="SenderSearch">Search Sender Group</label>
+                            <input type="text" id="SenderSearch" ng-model="search.album" class="form-control">
+                        </div>
+                        <div class="col-xs-12 col-md-6 col-lg-2">
+                            <label class="label" for="OwnerSearch">Search Sender Owner</label>
+                            <input type="text" id="OwnerSearch" ng-model="search.creator" class="form-control">
+                        </div>
+                        <div class="col-xs-12 col-md-6 col-lg-2">
+                            <label class="label" for="TypeSearch">Search Type</label>
+                            <select type="text" id="TypeSearch" ng-model="search.info" ng-options="opt for opt in InfoOptions" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="tracks.match">
+                        <div class="col-md-2 col-md-offset-1 label" >
+                            <h4>Match={{tracks.match}}</h4>
+                        </div>
+                        <div class="col-md-2 label" ng-show="tracks.mismatch">
+                            <h4>Misatch={{tracks.mismatch}}</h4>
+                        </div>
+                        <div class="col-md-2 label" ng-show="tracks.new">
+                            <h4>New={{tracks.new}}</h4>
+                        </div>
+                        <div class="col-md-2 label" ng-show="tracks.new">
+                            <h4>Old={{tracks.old}}</h4>
+                        </div>
+                        <div class="col-md-2 label" ng-show="tracks.new">
+                            <h4>Total={{tracks.total}}</h4>
+                        </div>
+                    </div>
+                    <br/>
+                </div>
+            </nav>
         </div>
     </body>
 </html>
